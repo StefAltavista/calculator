@@ -2,24 +2,25 @@
 // JS
 
 // Anastasiia
-// input event handler
-// input checks
+    // input event handler
+    // input checks
 
 // Stef
-// operation functions
-// simple state management (class)
-// special mathematical operations (SQR,% MemoryRecall)
-// loop (global )
+    // operation functions
+    // simple state management (class)
+    // special mathematical operations (SQR,% MemoryRecall)
+    // loop (global )
 
 // Elif
-// render on screen
+    // render on screen
+
 
 // ELIF
-// html structure
-// keyboard usage
+    // html structure
+    // keyboard usage
 
-// Anastasiia + all
-// css
-// find some examples
+// ALL
+    // css
+    // find some examples
 
 
