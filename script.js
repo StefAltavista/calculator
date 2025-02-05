@@ -71,6 +71,7 @@ function simpleEvaluate(expression) {
       return "Error";
   }
 }
+const errorMessage = document.querySelector(".error");
 
 function handleKeyPress(event) {
   let key = event.key;
@@ -82,6 +83,13 @@ function handleKeyPress(event) {
     clearEntry();
   } else if (key === "Escape") {
     clear();
+  } else {
+    console.log("error");
+    errorMessage.classList.remove("hide");
+
+    setTimeout(() => {
+      errorMessage.classList.add("hide");
+    }, 2000);
   }
 }
 

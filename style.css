@@ -139,15 +139,13 @@ header:hover {
   -moz-user-select: none;
   -ms-user-select: none;
   user-select: none;
+  background-color: rgb(252, 142, 173);
+  color: white;
+  opacity: 1;
 }
 
 .hide {
-  background-color: transparent;
-  color: transparent;
-}
-.show {
-  background-color: rgb(252, 142, 173);
-  color: white;
+  opacity: 0;
 }
 
 @keyframes jump {
