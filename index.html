@@ -5,51 +5,52 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <script type="module" src="./script.js"></script>
     <link rel="stylesheet" href="./style.css" />
-
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Silkscreen:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
     <title>Calculator</title>
   </head>
-  <body>
+  <body class="container">
     <header>
+      <img src="./ai_invasion.png" src="logo space invaders" class="logo" />
       <h1>Calculator</h1>
     </header>
     <main>
-      <div id="screen">
-        <input type="text" id="display" disabled />
-      </div>
-      <div id="keypad">
-        <div class="numbers">
-          <button class="btn" data-value="7">7</button>
-          <button class="btn" data-value="8">8</button>
-          <button class="btn" data-value="9">9</button>
-          <button class="btn" data-value="4">4</button>
-          <button class="btn" data-value="5">5</button>
-          <button class="btn" data-value="6">6</button>
-          <button class="btn" data-value="1">1</button>
-          <button class="btn" data-value="2">2</button>
-          <button class="btn" data-value="3">3</button>
-          <button class="btn" data-value="0">0</button>
+      <div id="operate">
+        <div class="display_container">
+          <input type="text" id="display" disabled />
+          <p class="error hide">ILLEGAL SYMBOL</p>
         </div>
-        <div class="operators">
-          <button class="btn" data-value="C">C</button>
-          <button class="btn" data-value="CE">CE</button>
-          <button class="btn" data-value="+">+</button>
-          <button class="btn" data-value="-">-</button>
-          <button class="btn" data-value="*">*</button>
-          <button class="btn" data-value="/">/</button>
-          <button class="btn" data-value="%">%</button>
-
-          <!-- <button class="btn" data-value="(">(</button>
-          <button class="btn" data-value=")">)</button> -->
-          <button class="btn" data-value="=">=</button>
+        <div id="keypad">
+          <div class="numbers">
+            <button class="btn" data-value="7">7</button>
+            <button class="btn" data-value="8">8</button>
+            <button class="btn" data-value="9">9</button>
+            <button class="btn" data-value="4">4</button>
+            <button class="btn" data-value="5">5</button>
+            <button class="btn" data-value="6">6</button>
+            <button class="btn" data-value="1">1</button>
+            <button class="btn" data-value="2">2</button>
+            <button class="btn" data-value="3">3</button>
+            <button class="btn" data-value="0">0</button>
+          </div>
+          <div class="breaking_line"></div>
+          <div class="operators">
+            <button class="btn" data-value="+">+</button>
+            <button class="btn" data-value="C">C</button>
+            <button class="btn" data-value="-">-</button>
+            <button class="btn" data-value="CE">CE</button>
+            <button class="btn" data-value="*">X</button>
+            <button class="btn" data-value="=">=</button>
+            <button class="btn" data-value="/">/</button>
+          </div>
         </div>
       </div>
-      <div class="memory">
-        <textarea id="records"></textarea>
-      </div>
 
-
+      <textarea id="history">Operations</textarea>
     </main>
-    
-   
   </body>
 </html>
