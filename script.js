@@ -2,9 +2,15 @@ let equation = "";
 let history = [];
 let result = "";
 
+const input = document.querySelector("#display");
+const buttons = document.querySelectorAll(".btn");
+const historyElement = document.querySelector("#history");
+const errorMessage = document.querySelector(".error");
+
+
 document.addEventListener("DOMContentLoaded", () => {
   document.addEventListener("keydown", handleKeyPress);
-  document.querySelectorAll(".btn").forEach((button) => {
+  buttons.forEach((button) => {
     button.addEventListener("click", (event) => {
       let value = event.target.getAttribute("data-value");
       if (value) handleButtonPress(value);
@@ -20,8 +26,12 @@ function handleButtonPress(value) {
 }
 
 function append(value) {
-  if (/[0-9+\-*/%]/.test(value)) {
-    equation += value;
+  if (/[0-9]/.test(value)) {
+      equation += value;
+  } else if (/[+\-*/%]/.test(value)) {
+      if (!/[+\-*/%]$/.test(equation) && equation.length > 0) {
+          equation += value;
+      }
   }
   updateDisplay();
 }
@@ -71,16 +81,20 @@ function simpleEvaluate(expression) {
       return "Error";
   }
 }
-const errorMessage = document.querySelector(".error");
+
 
 function handleKeyPress(event) {
   let key = event.key;
-  if (/\d|[+\-*/%]/.test(key)) {
-    append(key);
+  if (/\d/.test(key)) {
+      append(key);
+  } else if (/[+\-*/%]|Shift|Control/.test(key)) {
+      if (!/[+\-*/%]|Shift|Control$/.test(equation) && equation.length > 0) {
+          append(key);
+      }
   } else if (key === "Enter") {
-    calculate();
+      calculate();
   } else if (key === "Backspace") {
-    clearEntry();
+      clearEntry();
   } else if (key === "Escape") {
     clear();
   } else {
@@ -89,15 +103,14 @@ function handleKeyPress(event) {
 
     setTimeout(() => {
       errorMessage.classList.add("hide");
-    }, 2000);
+    }, 500);
   }
 }
 
 function updateDisplay() {
-  document.getElementById("display").value = equation;
+  input.value = equation;
 }
 
 function updateHistory() {
-  let historyElement = document.getElementById("history");
   historyElement.value = history.join("\n");
 }
