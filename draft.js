@@ -1,132 +1,125 @@
-// Version with sequential evaluation, but negative values doesn't work
-
-let equation = "";
-let history = [];
-let result = "";
-
 const input = document.querySelector("#display");
 const buttons = document.querySelectorAll(".btn");
-const historyElement = document.querySelector("#records");
+const historyElement = document.querySelector("#history");
+const errorMessage = document.querySelector(".error");
+const keys = document.querySelector('#keypad');
 
-document.addEventListener("DOMContentLoaded", () => {
-    document.addEventListener("keydown", handleKeyPress);
-    buttons.forEach(button => {
-        button.addEventListener("click", (event) => {
-          let value = event.target.getAttribute("data-value");
-          if (value) handleButtonPress(value)
+const calculator = {
+  displayValue: '0',
+  first: null,
+  waitingForsecond: false,
+  operator: null,
+  equation: "",
+  history: [],
+  result: "",
+  equel: false,
+};
 
-        });
-    });
-});
+function inputDigit(digit) {
+  const { displayValue, waitingForsecond } = calculator;
 
-function handleButtonPress(value) {
-    if (value === "C") clear();
-    else if (value === "CE") clearEntry();
-    else if (value === "=") calculate();
-    else append(value);
-}
-
-function append(value) {
-    if (/[0-9\+\-\*/%()]/.test(value)) {
-        equation += value;
+  if (waitingForsecond === true) {
+      calculator.displayValue = digit;
+      calculator.waitingForsecond = false;
+  } else {
+      calculator.displayValue = displayValue === '0' ? digit : displayValue + digit;
   }
-  else {
-    input.classList.add("error");
-    errorMessage.style.display = "block";
+}
+
+function inputDecimal(dot) {
+  if (calculator.waitingForsecond === true) return;
+
+  if (!calculator.displayValue.includes(dot)) {
+      calculator.displayValue += dot;
   }
-    updateDisplay();
 }
 
-function clear() {
-    equation = "";
-    updateDisplay();
-}
+function handleInput(nextOperator) {
+  const { first, displayValue, operator } = calculator;
+  const inputValue = parseFloat(displayValue);
 
-function clearEntry() {
-    equation = equation.slice(0, -1);
-    updateDisplay();
-}
+  if (operator && calculator.waitingForsecond) {
+      calculator.operator = nextOperator;
+      return;
+  }
 
-function calculate() {
-    try {
-        result = safeEvaluate(equation);
-        history.push(`${equation} = ${result}`);
-        equation = result.toString();
-    } catch {
-        result = "Error";
-    }
-    updateDisplay();
+  if (first == null && !isNaN(inputValue)) {
+      calculator.first = inputValue;
+  } else if (operator && calculator.equel) {
+    const operation = performCalculation[operator](first, inputValue);
+    let result = parseFloat(operation.toFixed(2))
+    calculator.equation = `${first} ${operator} ${inputValue} = ${result}`;
+    calculator.history.push(`${first} ${operator} ${inputValue} = ${result}`);
     updateHistory();
+    calculator.displayValue = calculator.equation;
+    calculator.first = result;
+  }
+
+  calculator.waitingForsecond = true;
+  calculator.operator = nextOperator;
+  calculator.equel = false;
 }
 
-function safeEvaluate(expression) {
-    let tokens = expression.match(/\d+|[+\-*/%()]/g);
-    if (!tokens) return "Error";
-    
-    let outputQueue = [];
-    let operators = [];
-    let precedence = { '+': 1, '-': 1, '*': 2, '/': 2, '%': 2 };
-    
-    tokens.forEach(token => {
-        if (/\d+/.test(token)) {
-            outputQueue.push(parseFloat(token));
-        } else if (token in precedence) {
-            while (operators.length && precedence[operators[operators.length - 1]] >= precedence[token]) {
-                outputQueue.push(operators.pop());
-            }
-            operators.push(token);
-        } else if (token === '(') {
-            operators.push(token);
-        } else if (token === ')') {
-            while (operators.length && operators[operators.length - 1] !== '(') {
-                outputQueue.push(operators.pop());
-            }
-            operators.pop();
-        }
-    });
-    while (operators.length) {
-        outputQueue.push(operators.pop());
-    }
-    return evaluatePostfix(outputQueue);
-}
+const performCalculation = {
+  '/': (first, second) => second !== 0 ? first / second : "Error",
+  '*': (first, second) => (first!=="Error" && second!="Error")?(first * second):"Error",
+  '+': (first, second) => (first!=="Error" && second!="Error")?(first + second):"Error",
+  '-': (first, second) => (first!=="Error" && second!="Error")?(first - second):"Error",
+};
 
-function evaluatePostfix(queue) {
-    let stack = [];
-    queue.forEach(token => {
-        if (typeof token === 'number') {
-            stack.push(token);
-        } else {
-            let b = stack.pop();
-            let a = stack.pop();
-            switch (token) {
-                case '+': stack.push(a + b); break;
-                case '-': stack.push(a - b); break;
-                case '*': stack.push(a * b); break;
-                case '/': stack.push(a / b); break;
-                case '%': stack.push(a % b); break;
-            }
-        }
-    });
-    return stack[0];
-}
-
-function handleKeyPress(event) {
-    let key = event.key;
-    if (/\d|[+\-*/%()]/.test(key)) {
-        append(key);
-    } else if (key === "Enter") {
-        calculate();
-    } else if (key === "Backspace") {
-        clearEntry();
-    } else if (key === "Escape") {
-        clear();
-    }
+function resetCalculator() {
+  calculator.displayValue = '0';
+  calculator.first = null;
+  calculator.waitingForsecond = false;
+  calculator.operator = null;
+  calculator.equation = '';
+  calculator.equel = false;
 }
 
 function updateDisplay() {
-    input.value = equation;
+  input.value = calculator.displayValue;
 }
 
 function updateHistory() {
-    historyElement.value = history.join("\n");
+  historyElement.value = calculator.history.join("\n");
 }
+
+updateDisplay();
+
+keys.addEventListener('click', (event) => {
+  const { target } = event;
+  if (!target.matches('button')) {
+      return;
+  }
+
+  if (target.classList.contains('operator')) {
+      handleInput(target.value);
+      updateDisplay();
+      return;
+  }
+  
+  if (target.classList.contains('equal-sign')) {
+    calculator.equel = true;
+    handleInput();
+    updateDisplay();
+    return;
+  }
+
+
+  if (target.classList.contains('decimal')) {
+      inputDecimal(target.value);
+      updateDisplay();
+      return;
+  }
+
+  if (target.classList.contains('all-clear')) {
+      resetCalculator();
+      updateDisplay();
+      return;
+  }
+
+  inputDigit(target.value);
+  updateDisplay();
+});
+
+

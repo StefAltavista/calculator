@@ -26,12 +26,8 @@ function handleButtonPress(value) {
 }
 
 function append(value) {
-  if (/[0-9]/.test(value)) {
+  if (/[0-9+\-*/%]/.test(value)) {
       equation += value;
-  } else if (/[+\-*/%]/.test(value)) {
-      if (!/[+\-*/%]$/.test(equation) && equation.length > 0) {
-          equation += value;
-      }
   }
   updateDisplay();
 }
@@ -85,12 +81,8 @@ function simpleEvaluate(expression) {
 
 function handleKeyPress(event) {
   let key = event.key;
-  if (/\d/.test(key)) {
-      append(key);
-  } else if (/[+\-*/%]|Shift|Control/.test(key)) {
-      if (!/[+\-*/%]|Shift|Control$/.test(equation) && equation.length > 0) {
+  if (/\d|[+\-*/%]|Shift|Control/.test(key)) {
           append(key);
-      }
   } else if (key === "Enter") {
       calculate();
   } else if (key === "Backspace") {
