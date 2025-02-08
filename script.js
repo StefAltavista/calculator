@@ -13,6 +13,7 @@ const calculator = {
   history: [],
   result: "",
   equel: false,
+  isDot: false,
 };
 
 function inputDigit(digit) {
@@ -30,7 +31,8 @@ function inputDecimal(dot) {
   if (calculator.waitingForsecond === true) return;
 
   if (!calculator.displayValue.includes(dot)) {
-      calculator.displayValue += dot;
+    calculator.displayValue += dot;
+    calculator.isDot = true;
   }
 }
 
@@ -47,20 +49,17 @@ function handleInput(nextOperator) {
       calculator.first = inputValue;
   } else if (operator || calculator.equel) {
     const operation = performCalculation[operator](first, inputValue);
-       if (operation === "Error") {
-      errorMessage.classList.remove("hide");
+    if (operation === "Error") showError();
 
-      setTimeout(() => {
-        errorMessage.classList.add("hide");
-      }, 1000);
-    }
-    let result = parseFloat(operation.toFixed(2))
+    let result = calculator.isDot ? parseFloat(operation.toFixed(4)) : operation;
+  
  
     calculator.equation = `${first} ${operator} ${inputValue} = ${result}`;
     calculator.history.push(`${first} ${operator} ${inputValue} = ${result}`);
     updateHistory();
-    calculator.displayValue = calculator.equation;
+    calculator.displayValue = result;
     calculator.first = result;
+    calculator.isDot = false;
   }
 
   calculator.waitingForsecond = true;
@@ -82,7 +81,8 @@ function resetCalculator() {
   calculator.operator = null;
   calculator.equation = '';
   calculator.equel = false;
-  calculator.result= "";
+  calculator.result = "";
+  calculator.isDot = false;
 }
 
 function updateDisplay() {
@@ -92,6 +92,46 @@ function updateDisplay() {
 function updateHistory() {
   historyElement.value = calculator.history.join("\n");
 }
+
+function clearEntry() {
+  calculator.displayValue =  calculator.displayValue.slice(0, -1);
+  updateDisplay();
+}
+
+function showError() {
+  errorMessage.classList.remove("hide");
+
+  setTimeout(() => {
+    errorMessage.classList.add("hide");
+  }, 1000);
+}
+
+function handleKeyPress(event) {
+  let key = event.key;
+
+  if (/\d/.test(key)) {
+    inputDigit(key);
+    updateDisplay();
+  } else if (/[+\-*/]/.test(key)) {
+    handleInput(key);
+    updateDisplay();
+  } else if (key === "Enter" || key === "=") {
+    calculator.equel = true;
+    handleInput(calculator.operator);
+    updateDisplay();
+  } else if (key === "Backspace") { 
+    clearEntry();
+    updateDisplay();
+  } else if (key === "Delete" || key === "Escape") {
+    resetCalculator();
+    updateDisplay();
+  } else if (key === ".") {
+    inputDecimal(".");
+    updateDisplay();
+  }
+  else showError()
+}
+
 
 updateDisplay();
 
@@ -127,8 +167,17 @@ keys.addEventListener('click', (event) => {
       return;
   }
 
+  if (target.classList.contains('clear')) {
+    clearEntry();
+    updateDisplay();
+    return;
+}
+
   inputDigit(target.value);
   updateDisplay();
 });
 
 
+document.addEventListener("DOMContentLoaded", () => {
+  document.addEventListener("keydown", handleKeyPress);
+});
