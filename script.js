@@ -51,7 +51,7 @@ function handleInput(nextOperator) {
     const operation = performCalculation[operator](first, inputValue);
     if (operation === "Error") showError();
 
-    let result = calculator.isDot ? parseFloat(operation.toFixed(4)) : operation;
+    let result = !Number.isInteger(operator) ? parseFloat(operation.toFixed(4)) : operation;
   
  
     calculator.equation = `${first} ${operator} ${inputValue} = ${result}`;
@@ -59,12 +59,13 @@ function handleInput(nextOperator) {
     updateHistory();
     calculator.displayValue = result;
     calculator.first = result;
-    calculator.isDot = false;
+   
   }
 
   calculator.waitingForsecond = true;
   calculator.operator = nextOperator;
   calculator.equel = false;
+  calculator.isDot = false;
 }
 
 const performCalculation = {
@@ -94,8 +95,9 @@ function updateHistory() {
 }
 
 function clearEntry() {
-  calculator.displayValue =  calculator.displayValue.slice(0, -1);
+  calculator.displayValue = calculator.displayValue.toString().slice(0, -1);
   updateDisplay();
+  calculator.first = parseFloat(calculator.displayValue);
 }
 
 function showError() {
@@ -127,6 +129,8 @@ function handleKeyPress(event) {
     updateDisplay();
   } else if (key === ".") {
     inputDecimal(".");
+    updateDisplay();
+  } else if (key === "Shift") {
     updateDisplay();
   }
   else showError()
