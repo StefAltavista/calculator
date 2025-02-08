@@ -1,108 +1,125 @@
-let equation = "";
-let history = [];
-let result = "";
-
 const input = document.querySelector("#display");
 const buttons = document.querySelectorAll(".btn");
 const historyElement = document.querySelector("#history");
 const errorMessage = document.querySelector(".error");
+const keys = document.querySelector('#keypad');
 
+const calculator = {
+  displayValue: '0',
+  first: null,
+  waitingForsecond: false,
+  operator: null,
+  equation: "",
+  history: [],
+  result: "",
+  equel: false,
+};
 
-document.addEventListener("DOMContentLoaded", () => {
-  document.addEventListener("keydown", handleKeyPress);
-  buttons.forEach((button) => {
-    button.addEventListener("click", (event) => {
-      let value = event.target.getAttribute("data-value");
-      if (value) handleButtonPress(value);
-    });
-  });
-});
+function inputDigit(digit) {
+  const { displayValue, waitingForsecond } = calculator;
 
-function handleButtonPress(value) {
-  if (value === "C") clear();
-  else if (value === "CE") clearEntry();
-  else if (value === "=") calculate();
-  else append(value);
-}
-
-function append(value) {
-  if (/[0-9+\-*/%]/.test(value)) {
-      equation += value;
-  }
-  updateDisplay();
-}
-
-function clear() {
-  equation = "";
-  updateDisplay();
-}
-
-function clearEntry() {
-  equation = equation.slice(0, -1);
-  updateDisplay();
-}
-
-function calculate() {
-  try {
-    result = simpleEvaluate(equation);
-    history.push(`${equation} = ${result}`);
-    equation = result.toString();
-  } catch {
-    result = "Error";
-  }
-  updateDisplay();
-  updateHistory();
-}
-
-function simpleEvaluate(expression) {
-  let match = expression.match(/(-?\d+)([+\-*/%])(-?\d+)/);
-  if (!match) return "Error";
-
-  let a = parseFloat(match[1]);
-  let operator = match[2];
-  let b = parseFloat(match[3]);
-
-  switch (operator) {
-    case "+":
-      return a + b;
-    case "-":
-      return a - b;
-    case "*":
-      return a * b;
-    case "/":
-      return b !== 0 ? a / b : "Error";
-    case "%":
-      return b !== 0 ? a % b : "Error";
-    default:
-      return "Error";
-  }
-}
-
-
-function handleKeyPress(event) {
-  let key = event.key;
-  if (/\d|[+\-*/%]|Shift|Control/.test(key)) {
-          append(key);
-  } else if (key === "Enter") {
-      calculate();
-  } else if (key === "Backspace") {
-      clearEntry();
-  } else if (key === "Escape") {
-    clear();
+  if (waitingForsecond === true) {
+      calculator.displayValue = digit;
+      calculator.waitingForsecond = false;
   } else {
-    console.log("error");
-    errorMessage.classList.remove("hide");
-
-    setTimeout(() => {
-      errorMessage.classList.add("hide");
-    }, 500);
+      calculator.displayValue = displayValue === '0' ? digit : displayValue + digit;
   }
+}
+
+function inputDecimal(dot) {
+  if (calculator.waitingForsecond === true) return;
+
+  if (!calculator.displayValue.includes(dot)) {
+      calculator.displayValue += dot;
+  }
+}
+
+function handleInput(nextOperator) {
+  const { first, displayValue, operator } = calculator;
+  const inputValue = parseFloat(displayValue);
+
+  if (operator && calculator.waitingForsecond) {
+      calculator.operator = nextOperator;
+      return;
+  }
+
+  if (first == null && !isNaN(inputValue)) {
+      calculator.first = inputValue;
+  } else if (operator && calculator.equel) {
+    const operation = performCalculation[operator](first, inputValue);
+    let result = parseFloat(operation.toFixed(2))
+    calculator.equation = `${first} ${operator} ${inputValue} = ${result}`;
+    calculator.history.push(`${first} ${operator} ${inputValue} = ${result}`);
+    updateHistory();
+    calculator.displayValue = calculator.equation;
+    calculator.first = result;
+  }
+
+  calculator.waitingForsecond = true;
+  calculator.operator = nextOperator;
+  calculator.equel = false;
+}
+
+const performCalculation = {
+  '/': (first, second) => second !== 0 ? first / second : "Error",
+  '*': (first, second) => (first!=="Error" && second!="Error")?(first * second):"Error",
+  '+': (first, second) => (first!=="Error" && second!="Error")?(first + second):"Error",
+  '-': (first, second) => (first!=="Error" && second!="Error")?(first - second):"Error",
+};
+
+function resetCalculator() {
+  calculator.displayValue = '0';
+  calculator.first = null;
+  calculator.waitingForsecond = false;
+  calculator.operator = null;
+  calculator.equation = '';
+  calculator.equel = false;
 }
 
 function updateDisplay() {
-  input.value = equation;
+  input.value = calculator.displayValue;
 }
 
 function updateHistory() {
-  historyElement.value = history.join("\n");
+  historyElement.value = calculator.history.join("\n");
 }
+
+updateDisplay();
+
+keys.addEventListener('click', (event) => {
+  const { target } = event;
+  if (!target.matches('button')) {
+      return;
+  }
+
+  if (target.classList.contains('operator')) {
+      handleInput(target.value);
+      updateDisplay();
+      return;
+  }
+  
+  if (target.classList.contains('equal-sign')) {
+    calculator.equel = true;
+    handleInput();
+    updateDisplay();
+    return;
+  }
+
+
+  if (target.classList.contains('decimal')) {
+      inputDecimal(target.value);
+      updateDisplay();
+      return;
+  }
+
+  if (target.classList.contains('all-clear')) {
+      resetCalculator();
+      updateDisplay();
+      return;
+  }
+
+  inputDigit(target.value);
+  updateDisplay();
+});
+
+
