@@ -47,7 +47,15 @@ function handleInput(nextOperator) {
       calculator.first = inputValue;
   } else if (operator && calculator.equel) {
     const operation = performCalculation[operator](first, inputValue);
+       if (operation === "Error") {
+      errorMessage.classList.remove("hide");
+
+      setTimeout(() => {
+        errorMessage.classList.add("hide");
+      }, 1000);
+    }
     let result = parseFloat(operation.toFixed(2))
+ 
     calculator.equation = `${first} ${operator} ${inputValue} = ${result}`;
     calculator.history.push(`${first} ${operator} ${inputValue} = ${result}`);
     updateHistory();
@@ -61,10 +69,10 @@ function handleInput(nextOperator) {
 }
 
 const performCalculation = {
-  '/': (first, second) => second !== 0 ? first / second : "Error",
-  '*': (first, second) => (first!=="Error" && second!="Error")?(first * second):"Error",
-  '+': (first, second) => (first!=="Error" && second!="Error")?(first + second):"Error",
-  '-': (first, second) => (first!=="Error" && second!="Error")?(first - second):"Error",
+  '/': (first, second) => (first!=="Error" && second!=="Error" && second !== 0)?(first / second):"Error",
+  '*': (first, second) => (first!=="Error" && second!=="Error")?(first * second):"Error",
+  '+': (first, second) => (first!=="Error" && second!=="Error")?(first + second):"Error",
+  '-': (first, second) => (first!=="Error" && second!=="Error")?(first - second):"Error",
 };
 
 function resetCalculator() {
@@ -74,6 +82,7 @@ function resetCalculator() {
   calculator.operator = null;
   calculator.equation = '';
   calculator.equel = false;
+  calculator.result= "";
 }
 
 function updateDisplay() {
