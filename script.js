@@ -45,7 +45,7 @@ function handleInput(nextOperator) {
 
   if (first == null && !isNaN(inputValue)) {
       calculator.first = inputValue;
-  } else if (operator && calculator.equel) {
+  } else if (operator || calculator.equel) {
     const operation = performCalculation[operator](first, inputValue);
        if (operation === "Error") {
       errorMessage.classList.remove("hide");
