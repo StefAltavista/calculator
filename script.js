@@ -51,7 +51,7 @@ function handleInput(nextOperator) {
     const operation = performCalculation[operator](first, inputValue);
     if (operation === "Error") showError();
 
-    let result = !Number.isInteger(operator) ? parseFloat(operation.toFixed(4)) : operation;
+    let result = (!Number.isInteger(operator) && operation !== "Error") ? parseFloat(operation.toFixed(4)) : operation;
   
  
     calculator.equation = `${first} ${operator} ${inputValue} = ${result}`;
@@ -96,8 +96,11 @@ function updateHistory() {
 
 function clearEntry() {
   calculator.displayValue = calculator.displayValue.toString().slice(0, -1);
-  updateDisplay();
+  if (calculator.displayValue === '') calculator.displayValue = '0'
+
   calculator.first = parseFloat(calculator.displayValue);
+  updateDisplay();
+
 }
 
 function showError() {

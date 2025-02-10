@@ -101,7 +101,7 @@ header:hover {
 .btn {
   border: none;
   background-color: rgb(221, 247, 240);
-  box-shadow: inset 5px 10px 30px 6px #ccd9fa;
+  box-shadow: inset 5px 10px 30px 6px #869fde;;
   width: 3.3em;
   height: 3.3em;
   border-radius: 50%;
@@ -112,7 +112,7 @@ header:hover {
   color: white;
 }
 .btn:hover {
-  box-shadow: inset 10px 15px 40px 9px #c7d3f1;
+  box-shadow: inset 10px 15px 40px 9px #8aa5ea;
 }
 
 #history {
