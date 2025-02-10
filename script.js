@@ -39,6 +39,7 @@ function inputDecimal(dot) {
 function handleInput(nextOperator) {
   const { first, displayValue, operator } = calculator;
   const inputValue = parseFloat(displayValue);
+  let result;
 
   if (operator && calculator.waitingForsecond) {
       calculator.operator = nextOperator;
@@ -49,9 +50,18 @@ function handleInput(nextOperator) {
       calculator.first = inputValue;
   } else if (operator || calculator.equel) {
     const operation = performCalculation[operator](first, inputValue);
-    if (operation === "Error") showError();
-
-    let result = (!Number.isInteger(operator) && operation !== "Error" && operation !== "NaN") ? parseFloat(operation.toFixed(4)) : operation;
+    console.log(operation);
+    if (operation === "Error" || isNaN(operation) || typeof operation === "undefined") {
+      showError();
+      setTimeout(() => {
+        resetCalculator();
+        updateDisplay();
+      }, 1000);
+      
+    } else if (!Number.isInteger(operator)) {
+      result = parseFloat(operation.toFixed(4))
+    } else result = operation;
+    
   
  
     calculator.equation = `${first} ${operator} ${inputValue} = ${result}`;
