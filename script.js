@@ -51,7 +51,7 @@ function handleInput(nextOperator) {
     const operation = performCalculation[operator](first, inputValue);
     if (operation === "Error") showError();
 
-    let result = (!Number.isInteger(operator) && operation !== "Error") ? parseFloat(operation.toFixed(4)) : operation;
+    let result = (!Number.isInteger(operator) && operation !== "Error" && operation !== "NaN") ? parseFloat(operation.toFixed(4)) : operation;
   
  
     calculator.equation = `${first} ${operator} ${inputValue} = ${result}`;
