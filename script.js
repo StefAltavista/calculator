@@ -52,6 +52,7 @@ function handleInput(nextOperator) {
     const operation = performCalculation[operator](first, inputValue);
     console.log(operation);
     if (operation === "Error" || isNaN(operation) || typeof operation === "undefined") {
+      result = 'Error';
       showError();
       setTimeout(() => {
         resetCalculator();
